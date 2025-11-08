@@ -30,3 +30,5 @@ class JobRepository(BaseRepository):
         await self.session.refresh(job)
         return job
 
+
+

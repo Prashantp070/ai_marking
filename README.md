@@ -103,6 +103,35 @@ docker compose up --build
 
 All heavy ML dependencies are optional; graceful fallbacks ensure the API remains responsive even when GPU-specific packages are missing.
 
+## 🤖 Machine Learning in Evaluation
+
+This project uses **Sentence Transformers** (`paraphrase-MiniLM-L6-v2`) to semantically compare handwritten OCR text with the reference answer. The ML-based evaluation service (`services/evaluation_service.py`) calculates text similarity using cosine similarity between embeddings and converts it into a normalized score (0–10).
+
+### How It Works
+
+1. **Model Loading**: The sentence transformer model is loaded once at startup and cached for performance.
+2. **Semantic Similarity**: Student answers and reference answers are converted to embeddings, and cosine similarity is calculated.
+3. **Score Mapping**: 
+   - Similarity < 0.4 → Score = 2
+   - Similarity 0.4–0.7 → Score = 2–8 (linear mapping)
+   - Similarity ≥ 0.7 → Score = 8–10 (linear mapping)
+4. **Confidence**: The normalized similarity (0–1) is used as the confidence metric.
+5. **Auto-Flagging**: Answers with confidence < 0.5 are automatically flagged for teacher review.
+
+### ML Evaluation Features
+
+- **Pure ML-based scoring**: Uses semantic similarity instead of keyword matching
+- **Confidence metrics**: Provides confidence scores for each evaluation
+- **Automatic review flags**: Low-confidence answers are flagged for manual review
+- **Fallback support**: Gracefully falls back to simple similarity if ML model is unavailable
+
+The evaluation results include:
+- `score`: ML-based score (0–10)
+- `confidence`: Model confidence (0–1)
+- `similarity`: Semantic similarity between answers (0–1)
+- `student_answer`: OCR-extracted text
+- `reference_answer`: Model/reference answer text
+
 ## Frontend Highlights
 
 - **Upload Page**: Handles multi-format uploads with live messaging.
@@ -151,4 +180,53 @@ GitHub Actions workflow (`.github/workflows/deploy.yml`) builds & deploys both f
 ---
 
 This scaffold provides a robust baseline to accelerate feature development while keeping production deployment paths clear and auditable.
+
+## 🚀 LOCAL RUN (Windows)
+
+1. Install PostgreSQL 16 → https://www.postgresql.org/download/windows/  
+
+   Note your password during setup.
+
+
+
+2. Ensure PostgreSQL `bin` is in PATH, or use pgAdmin.
+
+
+
+3. From project root:
+
+```powershell
+# Activate Python environment
+& .\.venv\Scripts\Activate.ps1
+
+# Create database
+.\scripts\create_db.ps1 -pgUser "postgres" -pgPassword "YOUR_PASSWORD" -dbName "markingdb"
+
+# Copy .env.example → .env and edit:
+# DATABASE_URL=postgresql+asyncpg://postgres:YOUR_PASSWORD@localhost:5432/markingdb
+
+# Start backend
+.\run_backend.ps1
+
+# In another PowerShell window
+.\fix_frontend.ps1
+
+# Access:
+# Backend → http://localhost:8000/docs
+# Frontend → http://localhost:5173
+```
+
+4. (Optional) To clean node_modules before commit:
+
+```powershell
+.\scripts\cleanup_git_node.ps1
+```
+
+5. (Optional) For quick dev without PostgreSQL, edit `.env`:
+
+```
+DATABASE_URL=sqlite+aiosqlite:///./test.db
+```
+
+Then rerun backend.
 

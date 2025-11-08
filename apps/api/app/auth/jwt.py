@@ -28,3 +28,5 @@ def decode_token(token: str, refresh: bool = False) -> Any:
     secret = settings.JWT_REFRESH_SECRET_KEY if refresh else settings.JWT_SECRET_KEY
     return jwt.decode(token, secret, algorithms=[settings.JWT_ALGORITHM])
 
+
+

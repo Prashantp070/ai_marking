@@ -20,3 +20,5 @@ class Question(Base):
 
     exam = relationship("Exam", backref="questions")
 
+
+

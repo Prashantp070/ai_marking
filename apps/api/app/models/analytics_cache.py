@@ -14,3 +14,5 @@ class AnalyticsCache(Base):
     payload = Column(JSON, default=dict)
     computed_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
+
+

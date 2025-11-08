@@ -1,6 +1,6 @@
 """Evaluation model."""
 
-from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, JSON, String
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, JSON, String, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -16,7 +16,13 @@ class Evaluation(Base):
     final_score = Column(Float, default=0.0)
     confidence = Column(Float, default=0.0)
     feedback = Column(String, nullable=True)
+    # ML evaluation fields
+    student_answer = Column(Text, nullable=True)
+    reference_answer = Column(Text, nullable=True)
+    similarity = Column(Float, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     submission = relationship("Submission", back_populates="evaluation")
+
+
 

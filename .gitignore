@@ -1,0 +1,18 @@
+# Node
+apps/web/node_modules/
+apps/web/dist/
+apps/web/.vite
+npm-debug.log
+yarn.lock
+pnpm-lock.yaml
+package-lock.json
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.env
+
+# Docker
+*.env.local
+

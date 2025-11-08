@@ -11,18 +11,32 @@ export default function DashboardPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const response = await api.get("/results/1");
-        setResults([
-          {
-            submissionId: 1,
-            finalScore: response.data.final_score,
-            confidence: response.data.confidence,
-            feedback: response.data.feedback,
-            scoreBreakdown: response.data.score_breakdown
+        // Get all submissions
+        const submissionsResponse = await api.get("/submissions");
+        const submissions = submissionsResponse.data.submissions || [];
+        
+        // Get results for each submission that has evaluation
+        const resultsList: Evaluation[] = [];
+        for (const submission of submissions) {
+          if (submission.has_evaluation) {
+            try {
+              const resultResponse = await api.get(`/results/${submission.id}`);
+              resultsList.push({
+                submissionId: submission.id,
+                finalScore: resultResponse.data.score || resultResponse.data.final_score || 0,
+                confidence: resultResponse.data.confidence || 0,
+                feedback: resultResponse.data.feedback || "",
+                scoreBreakdown: resultResponse.data.score_breakdown || {}
+              });
+            } catch (err) {
+              console.error(`Failed to load result for submission ${submission.id}`, err);
+            }
           }
-        ]);
+        }
+        
+        setResults(resultsList);
       } catch (error) {
-        console.error("Failed to load results", error);
+        console.error("Failed to load submissions", error);
       }
     };
     load();
@@ -39,4 +53,6 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+
 

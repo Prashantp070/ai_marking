@@ -12,7 +12,8 @@ export default function ResultCard({ result }: Props) {
         <span className="rounded bg-slate-800 px-2 py-1 text-xs text-slate-300">Confidence {Math.round(result.confidence * 100)}%</span>
       </header>
       <div className="space-y-2">
-        <p className="text-lg font-semibold text-white">Score: {result.finalScore}</p>
+        <p className="text-lg font-semibold text-white">Score: {result.finalScore?.toFixed(2) || "N/A"}</p>
+        <p className="text-sm text-slate-400">Confidence: {Math.round((result.confidence || 0) * 100)}%</p>
         {result.feedback && <p className="text-sm text-slate-300">Feedback: {result.feedback}</p>}
       </div>
       <footer className="mt-4 text-xs text-slate-400">
@@ -21,4 +22,6 @@ export default function ResultCard({ result }: Props) {
     </article>
   );
 }
+
+
 

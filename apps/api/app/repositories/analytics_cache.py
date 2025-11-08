@@ -26,3 +26,5 @@ class AnalyticsCacheRepository(BaseRepository):
         await self.session.refresh(cache)
         return cache
 
+
+

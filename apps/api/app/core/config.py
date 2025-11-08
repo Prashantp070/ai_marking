@@ -40,7 +40,10 @@ class Settings(BaseSettings):
     KW_WEIGHT: float = Field(0.5, env="KW_WEIGHT")
     SEM_WEIGHT: float = Field(0.5, env="SEM_WEIGHT")
 
-    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
+    model_config = SettingsConfigDict(
+        env_file=[".env", "../.env", "../../.env"], 
+        case_sensitive=True
+    )
 
     @field_validator("CORS_ORIGINS", mode="before")
     def parse_cors_origins(cls, value: str | List[AnyHttpUrl]):

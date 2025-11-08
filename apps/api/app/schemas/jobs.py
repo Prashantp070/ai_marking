@@ -17,3 +17,5 @@ class BatchRequest(BaseModel):
     exam_id: int
     files: list[str]
 
+
+

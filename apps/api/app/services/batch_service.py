@@ -14,3 +14,5 @@ class BatchProcessingService:
         job = Job(job_id=str(uuid.uuid4()), job_type=job_type, metadata=metadata or {})
         return await self.job_repo.create(job)
 
+
+

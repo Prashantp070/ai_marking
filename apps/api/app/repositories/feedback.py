@@ -21,3 +21,5 @@ class FeedbackRepository(BaseRepository):
         result = await self.session.execute(select(Feedback).where(Feedback.evaluation_id == evaluation_id))
         return result.scalars().all()
 
+
+

@@ -20,3 +20,5 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
     except JWTError as exc:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials") from exc
 
+
+

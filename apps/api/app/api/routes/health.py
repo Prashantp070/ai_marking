@@ -10,3 +10,5 @@ router = APIRouter()
 async def healthz() -> dict[str, str]:
     return {"status": "ok"}
 
+
+

@@ -16,3 +16,5 @@ class Feedback(Base):
     suggested_score = Column(Float, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
+
+

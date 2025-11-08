@@ -38,3 +38,5 @@ export default function AdminTable({ rows }: Props) {
   );
 }
 
+
+

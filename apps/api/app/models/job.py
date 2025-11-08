@@ -17,3 +17,5 @@ class Job(Base):
     job_metadata = Column(JSON, default=dict)  # renamed from `metadata`
     result = Column(JSON, default=dict)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+

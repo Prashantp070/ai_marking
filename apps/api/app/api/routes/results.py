@@ -18,10 +18,16 @@ async def get_results(submission_id: int, current_user: dict = Depends(get_curre
         if evaluation is None:
             raise HTTPException(status_code=404, detail="Results not ready")
         return {
+            "status": "success",
             "submission_id": submission_id,
-            "final_score": evaluation.final_score,
+            "score": evaluation.final_score,
             "confidence": evaluation.confidence,
             "feedback": evaluation.feedback,
+            "student_answer": evaluation.student_answer,
+            "reference_answer": evaluation.reference_answer,
+            "similarity": evaluation.similarity,
             "score_breakdown": evaluation.score_breakdown,
         }
+
+
 
