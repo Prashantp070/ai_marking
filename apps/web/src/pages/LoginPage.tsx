@@ -16,7 +16,7 @@ export default function LoginPage() {
 
     try {
       console.log("Attempting login...", { email });
-      const response = await axios.post("/api/v1/auth/login", {
+      const response = await axios.post("http://localhost:8000/api/v1/auth/login", {
         email,
         password,
       });
@@ -48,7 +48,6 @@ export default function LoginPage() {
       } else {
         setMessage(`Login failed: ${errorMessage}`);
       }
-    } finally {
       setIsLoading(false);
     }
   };
@@ -60,7 +59,7 @@ export default function LoginPage() {
 
     try {
       console.log("Attempting registration...", { email });
-      const response = await axios.post("/api/v1/auth/register", {
+      const response = await axios.post("http://localhost:8000/api/v1/auth/register", {
         email,
         password,
         full_name: email.split("@")[0], // Use email prefix as name
@@ -91,7 +90,6 @@ export default function LoginPage() {
       } else {
         setMessage(`Registration failed: ${errorMessage}`);
       }
-    } finally {
       setIsLoading(false);
     }
   };
@@ -142,7 +140,11 @@ export default function LoginPage() {
             </button>
             <button
               type="button"
-              onClick={handleRegister}
+              onClick={(e) => {
+                e.preventDefault();
+                const fakeEvent = { preventDefault: () => {} };
+                handleRegister(fakeEvent as React.FormEvent<HTMLFormElement>);
+              }}
               disabled={isLoading}
               className="flex-1 rounded border border-slate-700 bg-slate-800 px-4 py-2 font-semibold text-slate-300 hover:bg-slate-700 disabled:opacity-50"
             >

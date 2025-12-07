@@ -1,9 +1,9 @@
 """Application configuration handling."""
 
 from functools import lru_cache
-from typing import List
+from typing import List, Optional
 
-from pydantic import AnyHttpUrl, Field, RedisDsn, field_validator
+from pydantic import Field, RedisDsn, field_validator, validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     VERSION: str = "0.1.0"
 
     API_V1_STR: str = "/api/v1"
-    CORS_ORIGINS: List[AnyHttpUrl] = Field(default_factory=lambda: ["http://localhost:5173"])
+    CORS_ORIGINS: List[str] = Field(default_factory=lambda: ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8000", "http://127.0.0.1:8000"])
 
     DATABASE_URL: str = Field(
         "postgresql+asyncpg://postgres:postgres@localhost:5432/ai_handwritten", env="DATABASE_URL"

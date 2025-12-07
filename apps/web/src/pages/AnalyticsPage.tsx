@@ -14,7 +14,10 @@ export default function AnalyticsPage() {
     const load = async () => {
       try {
         const response = await api.get("/analytics/overview");
-        setOverview(response.data);
+        const data = response.data;
+        if (data) {
+          setOverview(data);
+        }
       } catch (error) {
         console.error("Failed to load analytics", error);
       }

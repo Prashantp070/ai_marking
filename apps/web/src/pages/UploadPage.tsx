@@ -18,6 +18,7 @@ export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [submissionId, setSubmissionId] = useState<number | null>(null);
+  // Use submissionId in component
   const [evaluationResult, setEvaluationResult] = useState<EvaluationResult | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -44,8 +45,11 @@ export default function UploadPage() {
 
     try {
       console.log("Sending request to /api/v1/uploads...");
-      // Don't set Content-Type manually - axios will set it automatically with boundary
-      const uploadResponse = await api.post("/uploads", formData);
+      const uploadResponse = await api.post("/uploads", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
       console.log("Upload successful:", uploadResponse.data);
       const newSubmissionId = uploadResponse.data.submission_id;
       setSubmissionId(newSubmissionId);
@@ -95,7 +99,18 @@ export default function UploadPage() {
         fullError: error
       });
       
-      const errorMessage = error?.response?.data?.detail || error?.message || "Upload failed. Please try again.";
+      let errorMessage = "Upload failed. Please try again.";
+      if (error?.response?.data?.detail) {
+        // Handle case where detail is an array or object
+        if (typeof error.response.data.detail === 'object') {
+          errorMessage = "Upload failed: Invalid request format";
+        } else {
+          errorMessage = error.response.data.detail;
+        }
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+
       if (error?.response?.status === 401) {
         setMessage("Authentication required. Please log in first.");
       } else if (error?.response?.status === 400) {

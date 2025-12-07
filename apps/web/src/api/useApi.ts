@@ -7,12 +7,15 @@ export function useApi() {
       axios.create({
         baseURL: "/api/v1",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token") ?? ""}`
-        }
+          Authorization: `Bearer ${localStorage.getItem("access_token") ?? ""}`,
+          "Content-Type": "application/json",
+        },
+        withCredentials: true
       }),
     []
   );
 }
+
 
 
 
