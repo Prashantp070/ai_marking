@@ -5,17 +5,13 @@ export function useApi() {
   return useMemo(
     () =>
       axios.create({
-        baseURL: "/api/v1",
+        baseURL: "http://localhost:8000/api/v1",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token") ?? ""}`,
-          "Content-Type": "application/json",
+          // Content-Type yahan mat do – axios khud set karega
         },
-        withCredentials: true
+        withCredentials: true,
       }),
     []
   );
 }
-
-
-
-

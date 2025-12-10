@@ -1,9 +1,9 @@
 """Application configuration handling."""
 
 from functools import lru_cache
-from typing import List, Optional
+from typing import Any, List, Optional
 
-from pydantic import Field, RedisDsn, field_validator, validator
+from pydantic import AnyHttpUrl, Field, RedisDsn, field_validator, validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 

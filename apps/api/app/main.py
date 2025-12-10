@@ -46,7 +46,11 @@ def create_app() -> FastAPI:
 
     @app.on_event("startup")
     async def startup_event() -> None:
-        await init_db()
+        try:
+            await init_db()
+        except Exception as e:
+            print(f"Warning: Database initialization failed: {e}")
+            print("Continuing with server startup...")
 
     return app
 

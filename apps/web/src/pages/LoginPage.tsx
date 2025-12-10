@@ -1,165 +1,160 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
+import { EnvelopeIcon, LockClosedIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { useApi } from "../api/useApi";
 
 export default function LoginPage() {
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const api = useApi();
 
-  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsLoading(true);
-    setMessage(null);
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
-      console.log("Attempting login...", { email });
-      const response = await axios.post("http://localhost:8000/api/v1/auth/login", {
+      const response = await api.post("/auth/login", {
         email,
         password,
       });
 
-      console.log("Login response:", response.data);
-      if (response.data.access_token) {
+      if (response.data?.access_token) {
         localStorage.setItem("access_token", response.data.access_token);
-        localStorage.setItem("refresh_token", response.data.refresh_token || "");
-        setMessage("Login successful! Redirecting...");
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
+        localStorage.setItem("user_email", email);
+        navigate("/dashboard");
       }
-    } catch (error: any) {
-      console.error("Login error details:", {
-        message: error?.message,
-        code: error?.code,
-        status: error?.response?.status,
-        data: error?.response?.data,
-        fullError: error
-      });
-      
-      const errorMessage = error?.response?.data?.detail || error?.message || "Login failed. Please try again.";
-      
-      if (error?.code === "ERR_NETWORK" || error?.message?.includes("Network")) {
-        setMessage("Network Error: Backend not reachable. Please check if backend is running on http://localhost:8000");
-      } else if (error?.response?.status === 401) {
-        setMessage("Invalid email or password. Please try again.");
-      } else {
-        setMessage(`Login failed: ${errorMessage}`);
-      }
-      setIsLoading(false);
-    }
-  };
-
-  const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsLoading(true);
-    setMessage(null);
-
-    try {
-      console.log("Attempting registration...", { email });
-      const response = await axios.post("http://localhost:8000/api/v1/auth/register", {
-        email,
-        password,
-        full_name: email.split("@")[0], // Use email prefix as name
-      });
-
-      console.log("Registration response:", response.data);
-      if (response.data.access_token) {
-        localStorage.setItem("access_token", response.data.access_token);
-        localStorage.setItem("refresh_token", response.data.refresh_token || "");
-        setMessage("Registration successful! Redirecting...");
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
-      }
-    } catch (error: any) {
-      console.error("Registration error details:", {
-        message: error?.message,
-        code: error?.code,
-        status: error?.response?.status,
-        data: error?.response?.data,
-        fullError: error
-      });
-      
-      const errorMessage = error?.response?.data?.detail || error?.message || "Registration failed. Please try again.";
-      
-      if (error?.code === "ERR_NETWORK" || error?.message?.includes("Network")) {
-        setMessage("Network Error: Backend not reachable. Please check if backend is running on http://localhost:8000");
-      } else {
-        setMessage(`Registration failed: ${errorMessage}`);
-      }
-      setIsLoading(false);
+    } catch (err: any) {
+      setError(err.response?.data?.detail || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-900 px-4">
-      <div className="w-full max-w-md space-y-8 rounded-lg border border-slate-800 bg-slate-900/60 p-8">
-        <div>
-          <h1 className="text-center text-3xl font-semibold text-white">AI Evaluator</h1>
-          <p className="mt-2 text-center text-sm text-slate-400">Login or Register to continue</p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-white rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+      </div>
+
+      <div className="relative w-full max-w-md">
+        {/* Card */}
+        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 sm:px-8 py-8 sm:py-10">
+            <div className="flex items-center justify-center w-12 h-12 bg-white bg-opacity-20 rounded-xl mx-auto mb-4">
+              <span className="text-2xl">📝</span>
+            </div>
+            <h1 className="text-3xl font-bold text-white text-center">AI Marking</h1>
+            <p className="text-blue-100 text-center mt-2 text-sm">Intelligent Answer Evaluation System</p>
+          </div>
+
+          {/* Form */}
+          <div className="px-6 sm:px-8 py-8 sm:py-10">
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-700 text-sm font-medium">{error}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleLogin} className="space-y-5">
+              {/* Email Input */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <EnvelopeIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Password Input */}
+              <div>
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <LockClosedIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? (
+                      <EyeSlashIcon className="h-5 w-5" />
+                    ) : (
+                      <EyeIcon className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Login Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full mt-8 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-2.5 rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Signing in...
+                  </span>
+                ) : (
+                  "Sign In"
+                )}
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Don't have an account?</span>
+              </div>
+            </div>
+
+            {/* Register Link */}
+            <Link
+              to="/register"
+              className="w-full block text-center px-4 py-2.5 border-2 border-gray-200 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-all"
+            >
+              Create New Account
+            </Link>
+          </div>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-300">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              required
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              placeholder="your@email.com"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-300">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              required
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              placeholder="Enter your password"
-            />
-          </div>
-          {message && (
-            <p className={`text-sm ${message.includes("successful") ? "text-green-400" : "text-red-400"}`}>
-              {message}
-            </p>
-          )}
-          <div className="flex gap-4">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="flex-1 rounded bg-primary px-4 py-2 font-semibold text-white hover:bg-primary/80 disabled:opacity-50"
-            >
-              {isLoading ? "Loading..." : "Login"}
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                const fakeEvent = { preventDefault: () => {} };
-                handleRegister(fakeEvent as React.FormEvent<HTMLFormElement>);
-              }}
-              disabled={isLoading}
-              className="flex-1 rounded border border-slate-700 bg-slate-800 px-4 py-2 font-semibold text-slate-300 hover:bg-slate-700 disabled:opacity-50"
-            >
-              {isLoading ? "Loading..." : "Register"}
-            </button>
-          </div>
-        </form>
-
-        <div className="mt-4 rounded bg-slate-800/50 p-4 text-xs text-slate-400">
-          <p className="font-semibold text-slate-300">Demo Credentials:</p>
-          <p>Email: teacher@example.com</p>
-          <p>Password: Password123!</p>
-        </div>
+        {/* Footer */}
+        <p className="text-center text-blue-100 text-xs mt-6">
+          © 2025 AI Marking System. All rights reserved.
+        </p>
       </div>
     </div>
   );
 }
-

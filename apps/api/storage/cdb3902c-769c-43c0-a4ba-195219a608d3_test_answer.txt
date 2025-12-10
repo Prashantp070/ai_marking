@@ -1,0 +1,8 @@
+Question 1: What is the capital of France?
+Answer: Paris
+
+Question 2: What is 2 + 2?
+Answer: 4
+
+Question 3: Name a prime number.
+Answer: 7

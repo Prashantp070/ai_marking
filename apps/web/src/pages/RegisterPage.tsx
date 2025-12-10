@@ -1,0 +1,190 @@
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { EnvelopeIcon, LockClosedIcon, UserIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { useApi } from "../api/useApi";
+
+export default function RegisterPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
+  const api = useApi();
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    setLoading(true);
+
+    try {
+      const response = await api.post("/auth/register", {
+        email,
+        password,
+        full_name: fullName,
+      });
+
+      if (response.data?.access_token) {
+        setSuccess("Account created successfully! Redirecting...");
+        localStorage.setItem("access_token", response.data.access_token);
+        localStorage.setItem("user_email", email);
+        setTimeout(() => navigate("/dashboard"), 1500);
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.detail || "Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-600 via-blue-500 to-indigo-600 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-white rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+      </div>
+
+      <div className="relative w-full max-w-md">
+        {/* Card */}
+        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-green-600 to-blue-600 px-6 sm:px-8 py-8 sm:py-10">
+            <div className="flex items-center justify-center w-12 h-12 bg-white bg-opacity-20 rounded-xl mx-auto mb-4">
+              <span className="text-2xl">✍️</span>
+            </div>
+            <h1 className="text-3xl font-bold text-white text-center">Create Account</h1>
+            <p className="text-green-100 text-center mt-2 text-sm">Join AI Marking System</p>
+          </div>
+
+          {/* Form */}
+          <div className="px-6 sm:px-8 py-8 sm:py-10">
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-700 text-sm font-medium">{error}</p>
+              </div>
+            )}
+
+            {success && (
+              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-green-700 text-sm font-medium">{success}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleRegister} className="space-y-5">
+              {/* Name Input */}
+              <div>
+                <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <UserIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <input
+                    id="name"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="John Doe"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Email Input */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <EnvelopeIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Password Input */}
+              <div>
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <LockClosedIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all outline-none"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? (
+                      <EyeSlashIcon className="h-5 w-5" />
+                    ) : (
+                      <EyeIcon className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Register Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full mt-8 bg-gradient-to-r from-green-600 to-blue-600 text-white font-semibold py-2.5 rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Creating Account...
+                  </span>
+                ) : (
+                  "Create Account"
+                )}
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Already have an account?</span>
+              </div>
+            </div>
+
+            {/* Login Link */}
+            <Link
+              to="/"
+              className="w-full block text-center px-4 py-2.5 border-2 border-gray-200 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-all"
+            >
+              Sign In Instead
+            </Link>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <p className="text-center text-green-100 text-xs mt-6">
+          © 2025 AI Marking System. All rights reserved.
+        </p>
+      </div>
+    </div>
+  );
+}
